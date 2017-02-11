@@ -36,12 +36,6 @@ def createMainListing():
     PLUGIN.set_content(utils.getContentType())
     return items
 
-def log(msg):
-    f = open("/home/nalle/.kodi/temp/kodi.log", "a")
-    f.write(str(msg))
-    f.flush()
-    f.close()
-
 def getStreams(offset, limit):
     items = []
     url = "http://api.speedrunslive.com/frontend/streams?callback=getCustomStreamsList"
@@ -52,17 +46,7 @@ def getStreams(offset, limit):
     for stream in j['_source']['channels']:
         tmp.update({stream['user_name']: stream['current_viewers']})
 
-    for streamer in sorted(tmp, key=tmp.get, reverse=True):
-        if len(items) > limit:
-            break
-        if i < offset:
-            i = i+1
-            continue
-        try:
-            items.append(TWITCHTV.getStreamInfo(streamer))
-        except Exception:
-            pass
-        i = i+1
+    items = TWITCHTV.getMultipleStreamInfo(','.join(tmp), offset, limit)
     return items
 
 @PLUGIN.route('/createListOfChannels/<index>/')

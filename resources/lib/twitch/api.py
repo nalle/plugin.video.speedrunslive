@@ -102,6 +102,16 @@ class TwitchTV(object):
         else:
             raise TwitchException(TwitchException.STREAM_OFFLINE)
 
+    def getMultipleStreamInfo(self, channelnames, offset, limit):
+        # Get Stream info
+        url = "%s?limit=%s&offset=%s&channel=%s" % (Urls.STREAMS, limit, offset, channelnames)
+        stream = self._fetchStreamItems(url, Keys.STREAM)
+        if stream:
+            return stream
+        else:
+            raise TwitchException(TwitchException.STREAM_OFFLINE)
+
+
     def __getChunkedVideo(self, _id, oauthtoken):
         # twitch site queries chunked playlists also with token
         # not necessary yet but might change (similar to vod playlists)
@@ -221,3 +231,7 @@ class TwitchTV(object):
     def _fetchItems(self, url, key):
         items = self.scraper.getJson(url)
         return items[key] if items else []
+
+    def _fetchStreamItems(self, url, key):
+        items = self.scraper.getJson(url)
+        return items['streams']
